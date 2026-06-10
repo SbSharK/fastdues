@@ -96,6 +96,16 @@ export default function App() {
   // Context Menus
   const [isContactMenuOpen, setIsContactMenuOpen] = useState(false);
 
+  // Pull to Refresh / Net Balance states
+  const [pullOffset, setPullOffset] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showNetBalance, setShowNetBalance] = useState(false);
+  const touchStart = useRef<number | null>(null);
+
+  // Simulated Contacts Picker Modal
+  const [isSimContactModalOpen, setIsSimContactModalOpen] = useState(false);
+  const [simSearchQuery, setSimSearchQuery] = useState('');
+
   // File Input Ref
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -337,6 +347,78 @@ export default function App() {
     return 'red';
   };
 
+  // --- Pull to Refresh Touch Handlers ---
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const container = e.currentTarget;
+    if (container.scrollTop === 0 && !isRefreshing) {
+      touchStart.current = e.touches[0].clientY;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStart.current === null || isRefreshing) return;
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - touchStart.current;
+    if (diff > 0) {
+      setPullOffset(Math.min(diff * 0.4, 80));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart.current === null) return;
+    touchStart.current = null;
+    
+    if (pullOffset > 50) {
+      setIsRefreshing(true);
+      // Simulate reload animation
+      setTimeout(() => {
+        setIsRefreshing(false);
+        setShowNetBalance(true);
+        showToast('Overall balance updated', 'success');
+      }, 1200);
+    }
+    setPullOffset(0);
+  };
+
+  // --- Import from Contacts helper ---
+  const handleImportFromContacts = async () => {
+    if ('contacts' in navigator && 'ContactsManager' in window) {
+      try {
+        // @ts-ignore
+        const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+        if (contacts && contacts.length > 0) {
+          const c = contacts[0];
+          const name = c.name && c.name[0] ? c.name[0] : '';
+          const phone = c.tel && c.tel[0] ? c.tel[0] : '';
+          setContactFormName(name);
+          setContactFormPhone(phone);
+          showToast('Imported contact details!', 'success');
+          return;
+        }
+      } catch (err) {
+        console.error('Contacts API failed:', err);
+        showToast('Failed to access contacts', 'error');
+        return;
+      }
+    }
+    // Fallback: Simulator mode
+    setIsSimContactModalOpen(true);
+  };
+
+  // Mock Contacts for Simulator Mode
+  const simulatedContacts = [
+    { name: 'Amol Potdar', phone: '9637263330' },
+    { name: 'Rahul Sharma', phone: '9876543210' },
+    { name: 'Priya Patel', phone: '9123456789' },
+    { name: 'Amit Kumar', phone: '9988776655' },
+    { name: 'Sneha Reddy', phone: '9500012345' },
+    { name: 'Deepak Singh', phone: '9440054321' },
+    { name: 'Anjali Gupta', phone: '9300067890' },
+    { name: 'Vikram Malhotra', phone: '9200011223' },
+    { name: 'Sunita Verma', phone: '9100044556' },
+    { name: 'Rohan Joshi', phone: '9000099887' }
+  ];
+
   return (
     <div className={`app-container ${theme}`}>
       {/* Toast Notification */}
@@ -386,7 +468,7 @@ export default function App() {
           >
             {/* Drawer Header */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '54px', width: 'auto', alignSelf: 'flex-start' }} />
+              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '62px', width: 'auto', alignSelf: 'flex-start' }} />
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Personal Ledger App</p>
             </div>
 
@@ -469,6 +551,10 @@ export default function App() {
           from { transform: translateX(-100%); }
           to { transform: translateX(0); }
         }
+        @keyframes slideInDown {
+          from { transform: translateY(-30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
       `}</style>
 
       {/* --- SCREEN 1: HOME DASHBOARD --- */}
@@ -484,7 +570,7 @@ export default function App() {
               <Menu size={20} />
             </button>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '46px', width: 'auto' }} />
+               <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '54px', width: 'auto' }} />
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -514,63 +600,126 @@ export default function App() {
           </header>
 
           {/* Screen Content Wrapper */}
-          <main style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            
-            {/* Dashboard Net Balance Card */}
-            <div 
-              className="glass-panel" 
-              style={{ 
-                padding: '24px 20px', 
-                background: 'var(--card-gradient)',
-                textAlign: 'center',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-            >
-              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>NET BALANCE</span>
-              <h2 
-                style={{ 
-                  fontSize: '2.5rem', 
-                  fontWeight: 700, 
-                  margin: '8px 0',
-                  color: netBalance >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)'
-                }}
-              >
-                {netBalance < 0 ? '-' : ''}{dues.currencySymbol}{Math.abs(netBalance).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-              </h2>
+          <main 
+            style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              padding: '20px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '20px',
+              position: 'relative'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Pull to Refresh Indicator */}
+            {(pullOffset > 0 || isRefreshing) && (
               <div 
-                className="pulse text-xs font-semibold" 
-                style={{ 
-                  color: netBalance >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)',
-                  opacity: 0.8
+                style={{
+                  height: isRefreshing ? '60px' : `${pullOffset}px`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  transition: pullOffset === 0 ? 'height 0.3s ease-out' : 'none',
+                  color: 'var(--accent-purple)',
+                  flexShrink: 0
                 }}
               >
-                {netBalance >= 0 ? 'You will receive overall' : 'You must settle overall'}
+                <RefreshCw 
+                  size={22} 
+                  className={isRefreshing ? 'animate-spin' : ''} 
+                  style={{
+                    transform: isRefreshing ? 'none' : `rotate(${pullOffset * 4.5}deg)`,
+                    transition: isRefreshing ? 'none' : 'transform 0.1s linear'
+                  }}
+                />
               </div>
+            )}
 
-              {/* Dividers & Split */}
+            {/* Dashboard Net Balance Card */}
+            {showNetBalance && (
               <div 
+                className="glass-panel animate-fade-in" 
                 style={{ 
-                  display: 'flex', 
-                  borderTop: '1px solid var(--glass-border)', 
-                  marginTop: '20px', 
-                  paddingTop: '16px' 
+                  padding: '24px 20px', 
+                  background: 'var(--card-gradient)',
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  animation: 'slideInDown 0.3s ease-out'
                 }}
               >
-                <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid var(--glass-border)' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>YOU WILL GET</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent-emerald)', marginTop: '4px' }}>
-                    {dues.currencySymbol}{totals.getting.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
-                  </div>
+                {/* Dismiss Button */}
+                <button 
+                  type="button" 
+                  className="glass-button" 
+                  style={{ 
+                    position: 'absolute', 
+                    top: '12px', 
+                    right: '12px', 
+                    padding: '4px', 
+                    borderRadius: '50%', 
+                    border: 'none', 
+                    background: 'transparent',
+                    width: '24px',
+                    height: '24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  onClick={() => setShowNetBalance(false)}
+                >
+                  <X size={14} />
+                </button>
+
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', letterSpacing: '0.5px' }}>NET BALANCE</span>
+                <h2 
+                  style={{ 
+                    fontSize: '2.5rem', 
+                    fontWeight: 700, 
+                    margin: '8px 0',
+                    color: netBalance >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)'
+                  }}
+                >
+                  {netBalance < 0 ? '-' : ''}{dues.currencySymbol}{Math.abs(netBalance).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </h2>
+                <div 
+                  className="pulse text-xs font-semibold" 
+                  style={{ 
+                    color: netBalance >= 0 ? 'var(--accent-emerald)' : 'var(--accent-rose)',
+                    opacity: 0.8
+                  }}
+                >
+                  {netBalance >= 0 ? 'You will receive overall' : 'You must settle overall'}
                 </div>
-                <div style={{ flex: 1, textAlign: 'center' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>YOU WILL GIVE</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent-rose)', marginTop: '4px' }}>
-                    {dues.currencySymbol}{totals.giving.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+
+                {/* Dividers & Split */}
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    borderTop: '1px solid var(--glass-border)', 
+                    marginTop: '20px', 
+                    paddingTop: '16px' 
+                  }}
+                >
+                  <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid var(--glass-border)' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>YOU WILL GET</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent-emerald)', marginTop: '4px' }}>
+                      {dues.currencySymbol}{totals.getting.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>YOU WILL GIVE</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent-rose)', marginTop: '4px' }}>
+                      {dues.currencySymbol}{totals.giving.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Search and Filter */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1249,6 +1398,28 @@ export default function App() {
               </button>
             </div>
 
+            {contactModalMode === 'add' && (
+              <button
+                type="button"
+                className="glass-button"
+                style={{
+                  width: '100%',
+                  background: 'var(--active-btn-bg)',
+                  borderColor: 'var(--accent-purple)',
+                  color: 'var(--accent-purple)',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '12px'
+                }}
+                onClick={handleImportFromContacts}
+              >
+                <User size={16} /> Import from Device Contacts
+              </button>
+            )}
+
             {/* Input Name */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Full Name</label>
@@ -1483,6 +1654,111 @@ export default function App() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* --- MODAL: SIMULATOR CONTACTS PICKER --- */}
+      {isSimContactModalOpen && (
+        <div 
+          className="modal-overlay animate-fade-in"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 110,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+            backdropFilter: 'blur(8px)'
+          }}
+          onClick={() => setIsSimContactModalOpen(false)}
+        >
+          <div 
+            className="glass-panel animate-slide-up"
+            style={{
+              width: '100%',
+              maxWidth: '380px',
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              background: 'var(--drawer-bg)',
+              border: '1px solid var(--glass-border)',
+              maxHeight: '80%',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Select Contact (Simulated)
+              </h2>
+              <button 
+                type="button" 
+                className="glass-button" 
+                style={{ padding: '6px', borderRadius: '50%', border: 'none', background: 'transparent' }}
+                onClick={() => setIsSimContactModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Sim Search Bar */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search size={16} style={{ position: 'absolute', left: '14px', color: 'var(--text-muted)' }} />
+              <input 
+                type="text" 
+                className="glass-input" 
+                placeholder="Search simulated contacts..." 
+                style={{ width: '100%', paddingLeft: '40px', paddingTop: '10px', paddingBottom: '10px', fontSize: '0.9rem' }}
+                value={simSearchQuery}
+                onChange={(e) => setSimSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {/* Sim Contact List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', maxHeight: '300px' }}>
+              {simulatedContacts
+                .filter(c => c.name.toLowerCase().includes(simSearchQuery.toLowerCase()) || c.phone.includes(simSearchQuery))
+                .map((contact, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="glass-button"
+                    style={{
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      width: '100%',
+                      background: 'var(--glass-bg)',
+                      border: '1px solid var(--glass-border)',
+                      borderRadius: '12px'
+                    }}
+                    onClick={() => {
+                      setContactFormName(contact.name);
+                      setContactFormPhone(contact.phone);
+                      setIsSimContactModalOpen(false);
+                      showToast(`Imported contact: ${contact.name}`, 'success');
+                    }}
+                  >
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{contact.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{contact.phone}</div>
+                    </div>
+                    <User size={16} style={{ color: 'var(--accent-purple)' }} />
+                  </button>
+                ))
+              }
+              {simulatedContacts.filter(c => c.name.toLowerCase().includes(simSearchQuery.toLowerCase()) || c.phone.includes(simSearchQuery)).length === 0 && (
+                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  No simulated contacts found
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
