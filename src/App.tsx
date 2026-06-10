@@ -555,6 +555,40 @@ export default function App() {
           from { transform: translateY(-30px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
+        @keyframes ballBounce {
+          0%, 100% {
+            transform: translateY(0) scale(1.1, 0.9);
+            animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+          }
+          45% {
+            transform: translateY(-24px) scale(0.9, 1.15);
+          }
+          50% {
+            transform: translateY(-26px) scale(1, 1);
+            animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+          }
+          55% {
+            transform: translateY(-24px) scale(0.9, 1.15);
+          }
+          95% {
+            transform: translateY(0) scale(1.15, 0.85);
+          }
+        }
+        @keyframes lineBounce {
+          0%, 100% {
+            d: path("M 0 40 Q 200 40 400 40");
+          }
+          95% {
+            d: path("M 0 40 Q 200 46 400 40");
+          }
+        }
+        .bounce-ball-active {
+          animation: ballBounce 0.8s infinite;
+          transform-origin: 200px 40px;
+        }
+        .bounce-line-active {
+          animation: lineBounce 0.8s infinite;
+        }
       `}</style>
 
       {/* --- SCREEN 1: HOME DASHBOARD --- */}
@@ -623,19 +657,62 @@ export default function App() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   overflow: 'hidden',
-                  transition: pullOffset === 0 ? 'height 0.3s ease-out' : 'none',
-                  color: 'var(--accent-purple)',
-                  flexShrink: 0
+                  transition: pullOffset === 0 ? 'height 0.4s cubic-bezier(0.25, 1, 0.5, 1)' : 'none',
+                  flexShrink: 0,
+                  width: '100%'
                 }}
               >
-                <RefreshCw 
-                  size={22} 
-                  className={isRefreshing ? 'animate-spin' : ''} 
-                  style={{
-                    transform: isRefreshing ? 'none' : `rotate(${pullOffset * 4.5}deg)`,
-                    transition: isRefreshing ? 'none' : 'transform 0.1s linear'
+                <svg 
+                  viewBox="0 0 400 80" 
+                  preserveAspectRatio="none"
+                  style={{ 
+                    width: '100%', 
+                    height: '80px', 
+                    overflow: 'visible'
                   }}
-                />
+                >
+                  {isRefreshing ? (
+                    <>
+                      <path 
+                        className="bounce-line-active"
+                        d="M 0 40 Q 200 40 400 40"
+                        fill="none" 
+                        stroke="var(--accent-purple)" 
+                        strokeWidth="3.5" 
+                        strokeLinecap="round"
+                      />
+                      <circle 
+                        className="bounce-ball-active"
+                        cx="200" 
+                        cy="40" 
+                        r="8" 
+                        fill="var(--accent-purple)"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <path 
+                        d={`M 0 15 Q 200 ${15 + pullOffset * 0.7} 400 15`}
+                        fill="none" 
+                        stroke="var(--accent-purple)" 
+                        strokeWidth="3.5" 
+                        strokeLinecap="round"
+                        style={{
+                          transition: pullOffset === 0 ? 'd 0.4s cubic-bezier(0.25, 1, 0.5, 1)' : 'none'
+                        }}
+                      />
+                      <circle 
+                        cx="200" 
+                        cy={15 + pullOffset * 0.7} 
+                        r="8" 
+                        fill="var(--accent-purple)"
+                        style={{
+                          transition: pullOffset === 0 ? 'cy 0.4s cubic-bezier(0.25, 1, 0.5, 1)' : 'none'
+                        }}
+                      />
+                    </>
+                  )}
+                </svg>
               </div>
             )}
 
@@ -649,7 +726,8 @@ export default function App() {
                   textAlign: 'center',
                   position: 'relative',
                   overflow: 'hidden',
-                  animation: 'slideInDown 0.3s ease-out'
+                  animation: 'slideInDown 0.3s ease-out',
+                  flexShrink: 0
                 }}
               >
                 {/* Dismiss Button */}
@@ -722,7 +800,7 @@ export default function App() {
             )}
 
             {/* Search and Filter */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0 }}>
               {/* Search Bar */}
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <Search size={18} style={{ position: 'absolute', left: '16px', color: 'var(--text-muted)' }} />
@@ -777,7 +855,7 @@ export default function App() {
             </div>
 
             {/* Contacts Ledger List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Ledger Contacts</span>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{filteredContacts.length} contacts</span>
