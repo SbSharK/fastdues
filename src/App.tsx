@@ -378,34 +378,10 @@ export default function App() {
       {isDrawerOpen && (
         <div 
           className="drawer-overlay animate-fade-in"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0, 0, 0, 0.6)',
-            zIndex: 50,
-            backdropFilter: 'blur(4px)'
-          }}
           onClick={() => setIsDrawerOpen(false)}
         >
           <div 
             className="drawer-menu glass-panel"
-            style={{
-              width: '80%',
-              height: '100%',
-              borderRadius: '0 24px 24px 0',
-              borderTop: 'none',
-              borderBottom: 'none',
-              borderLeft: 'none',
-              background: 'linear-gradient(180deg, rgba(20, 16, 41, 0.95) 0%, rgba(11, 9, 20, 0.98) 100%)',
-              padding: '30px 20px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '24px',
-              animation: 'slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer Header */}
@@ -418,9 +394,7 @@ export default function App() {
             <div 
               className="glass-panel" 
               style={{ 
-                padding: '16px', 
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid rgba(255,255,255,0.06)'
+                padding: '16px'
               }}
             >
               <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Overall Balance</span>
@@ -445,7 +419,7 @@ export default function App() {
                 className="glass-button" 
                 style={{ 
                   justifyContent: 'flex-start', 
-                  background: activeScreen === 'home' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  background: activeScreen === 'home' ? 'var(--active-btn-bg)' : 'transparent',
                   border: 'none',
                   padding: '14px 16px'
                 }}
@@ -459,7 +433,7 @@ export default function App() {
                 className="glass-button" 
                 style={{ 
                   justifyContent: 'flex-start', 
-                  background: activeScreen === 'settings' ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  background: activeScreen === 'settings' ? 'var(--active-btn-bg)' : 'transparent',
                   border: 'none',
                   padding: '14px 16px'
                 }}
@@ -469,7 +443,7 @@ export default function App() {
                 Cloud & Settings
               </button>
 
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', margin: '15px 0' }} />
+              <div style={{ borderTop: '1px solid var(--glass-border)', margin: '15px 0' }} />
 
               <a 
                 href="#" 
@@ -547,7 +521,7 @@ export default function App() {
               className="glass-panel" 
               style={{ 
                 padding: '24px 20px', 
-                background: 'linear-gradient(135deg, rgba(30, 27, 75, 0.4) 0%, rgba(15, 12, 30, 0.6) 100%)',
+                background: 'var(--card-gradient)',
                 textAlign: 'center',
                 position: 'relative',
                 overflow: 'hidden'
@@ -578,12 +552,12 @@ export default function App() {
               <div 
                 style={{ 
                   display: 'flex', 
-                  borderTop: '1px solid rgba(255,255,255,0.06)', 
+                  borderTop: '1px solid var(--glass-border)', 
                   marginTop: '20px', 
                   paddingTop: '16px' 
                 }}
               >
-                <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid var(--glass-border)' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>YOU WILL GET</div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent-emerald)', marginTop: '4px' }}>
                     {dues.currencySymbol}{totals.getting.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
@@ -626,9 +600,9 @@ export default function App() {
                   display: 'flex', 
                   gap: '6px', 
                   padding: '4px', 
-                  background: 'rgba(255,255,255,0.02)',
+                  background: 'var(--glass-bg)',
                   borderRadius: '16px', 
-                  border: '1px solid rgba(255,255,255,0.04)' 
+                  border: '1px solid var(--glass-border)' 
                 }}
               >
                 {(['all', 'getting', 'giving', 'settled'] as const).map((filter) => (
@@ -641,9 +615,9 @@ export default function App() {
                       fontSize: '0.75rem', 
                       borderRadius: '12px',
                       textTransform: 'uppercase',
-                      background: activeFilter === filter ? 'rgba(255,255,255,0.08)' : 'transparent',
+                      background: activeFilter === filter ? 'var(--active-btn-bg)' : 'transparent',
                       border: 'none',
-                      color: activeFilter === filter ? '#fff' : 'var(--text-secondary)'
+                      color: activeFilter === filter ? 'var(--text-primary)' : 'var(--text-secondary)'
                     }}
                     onClick={() => setActiveFilter(filter)}
                   >
@@ -700,10 +674,10 @@ export default function App() {
                             height: '44px',
                             borderRadius: '22px',
                             background: bal > 0 
-                              ? 'linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)' 
+                              ? 'rgba(52, 211, 153, 0.12)' 
                               : bal < 0 
-                                ? 'linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(225, 29, 72, 0.05) 100%)' 
-                                : 'linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%)',
+                                ? 'rgba(244, 63, 94, 0.12)' 
+                                : 'rgba(167, 139, 250, 0.1)',
                             border: bal > 0 
                               ? '1px solid rgba(52, 211, 153, 0.3)' 
                               : bal < 0 
@@ -725,8 +699,8 @@ export default function App() {
                         </div>
                         
                         {/* Contact details */}
-                        <div>
-                          <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.95rem' }}>{contact.name}</div>
+                          <div>
+                            <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{contact.name}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
                             {contact.phone || 'No phone number'}
                           </div>
@@ -809,8 +783,8 @@ export default function App() {
                       position: 'absolute',
                       right: 0,
                       top: '46px',
-                      background: 'rgba(15, 12, 30, 0.95)',
-                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--glass-border)',
                       borderRadius: '16px',
                       padding: '8px',
                       zIndex: 51,
@@ -836,7 +810,7 @@ export default function App() {
                     >
                       <RefreshCw size={14} style={{ marginRight: '8px' }} /> Clear History
                     </button>
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '4px 0' }} />
+                    <div style={{ borderTop: '1px solid var(--glass-border)', margin: '4px 0' }} />
                     <button 
                       className="glass-button" 
                       style={{ border: 'none', justifyContent: 'flex-start', padding: '10px 12px', fontSize: '0.85rem', color: 'var(--accent-rose)' }}
@@ -863,15 +837,15 @@ export default function App() {
                     padding: '20px',
                     textAlign: 'center',
                     background: bal > 0 
-                      ? 'linear-gradient(135deg, rgba(6, 78, 59, 0.25) 0%, rgba(15, 12, 30, 0.4) 100%)' 
+                      ? 'rgba(52, 211, 153, 0.12)' 
                       : bal < 0 
-                        ? 'linear-gradient(135deg, rgba(159, 18, 57, 0.25) 0%, rgba(15, 12, 30, 0.4) 100%)' 
-                        : 'linear-gradient(135deg, rgba(30, 41, 59, 0.25) 0%, rgba(15, 12, 30, 0.4) 100%)',
+                        ? 'rgba(244, 63, 94, 0.12)' 
+                        : 'rgba(30, 41, 59, 0.12)',
                     borderColor: bal > 0 
                       ? 'rgba(52, 211, 153, 0.2)' 
                       : bal < 0 
                         ? 'rgba(244, 63, 94, 0.2)' 
-                        : 'rgba(255,255,255,0.08)'
+                        : 'var(--glass-border)'
                   }}
                 >
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Outstanding Balance</span>
@@ -884,7 +858,7 @@ export default function App() {
                         ? 'var(--accent-emerald)' 
                         : bal < 0 
                           ? 'var(--accent-rose)' 
-                          : '#fff'
+                          : 'var(--text-primary)'
                     }}
                   >
                     {bal < 0 ? '-' : ''}{dues.currencySymbol}{Math.abs(bal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -923,14 +897,13 @@ export default function App() {
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'space-between',
-                        cursor: 'pointer',
-                        background: 'rgba(255,255,255,0.02)'
+                        cursor: 'pointer'
                       }}
                       onClick={() => openEditTxModal(tx)}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {/* Title note */}
-                        <div style={{ color: '#fff', fontWeight: 500, fontSize: '0.9rem' }}>{tx.description}</div>
+                        <div style={{ color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.9rem' }}>{tx.description}</div>
                         {/* Date info */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
                           <Calendar size={12} />
@@ -1019,7 +992,7 @@ export default function App() {
             
             {/* Currency configuration */}
             <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff' }}>Default Currency</h3>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>Default Currency</h3>
               <div style={{ display: 'flex', gap: '8px' }}>
                 {['₹', '$', '€', '£'].map((sym) => (
                   <button
@@ -1028,7 +1001,7 @@ export default function App() {
                     style={{
                       flex: 1,
                       padding: '10px',
-                      background: dues.currencySymbol === sym ? 'rgba(167, 139, 250, 0.15)' : 'rgba(255,255,255,0.03)',
+                      background: dues.currencySymbol === sym ? 'var(--accent-purple-glow)' : 'var(--glass-bg)',
                       borderColor: dues.currencySymbol === sym ? 'var(--accent-purple)' : 'var(--glass-border)',
                       fontSize: '1.1rem',
                       fontWeight: 600
@@ -1044,7 +1017,7 @@ export default function App() {
             {/* Google Drive Integration card */}
             <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff' }}>Google Drive Backup</h3>
+                <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>Google Drive Backup</h3>
                 <span 
                   className={`btn-status ${getCloudStatusColor()}`} 
                   style={{ width: '32px', height: '32px', cursor: 'default' }}
@@ -1065,11 +1038,11 @@ export default function App() {
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>Google Account:</span>
-                      <span style={{ color: '#fff' }}>{dues.syncConfig.email}</span>
+                      <span style={{ color: 'var(--text-primary)' }}>{dues.syncConfig.email}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>Last Backup:</span>
-                      <span style={{ color: '#fff' }}>
+                      <span style={{ color: 'var(--text-primary)' }}>
                         {dues.syncConfig.lastBackupTime 
                           ? new Date(dues.syncConfig.lastBackupTime).toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', day: '2-digit', month: 'short' })
                           : 'Never'
@@ -1107,7 +1080,7 @@ export default function App() {
                 {!dues.syncConfig.isConnected ? (
                   <button 
                     className="glass-button" 
-                    style={{ background: 'linear-gradient(135deg, var(--accent-purple) 0%, #7c3aed 100%)', border: 'none' }}
+                    style={{ background: 'var(--accent-purple)', border: 'none' }}
                     onClick={() => {
                       gd.connectGoogleDrive();
                       showToast('Cloud connection set up!', 'success');
@@ -1120,7 +1093,7 @@ export default function App() {
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <button 
                         className="glass-button" 
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.04)' }}
+                        style={{ flex: 1 }}
                         disabled={gd.isSyncing}
                         onClick={handleManualCloudSync}
                       >
@@ -1133,7 +1106,7 @@ export default function App() {
                       </button>
                       <button 
                         className="glass-button" 
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.04)' }}
+                        style={{ flex: 1 }}
                         disabled={gd.isSyncing}
                         onClick={handleManualCloudRestore}
                       >
@@ -1150,7 +1123,7 @@ export default function App() {
                         style={{
                           padding: '6px 14px',
                           fontSize: '0.8rem',
-                          background: dues.syncConfig.isEnabled ? 'rgba(52, 211, 153, 0.15)' : 'rgba(255,255,255,0.04)',
+                          background: dues.syncConfig.isEnabled ? 'var(--accent-emerald-glow)' : 'var(--glass-bg)',
                           borderColor: dues.syncConfig.isEnabled ? 'var(--accent-emerald)' : 'var(--glass-border)',
                         }}
                         onClick={() => dues.updateSyncConfig({ isEnabled: !dues.syncConfig.isEnabled })}
@@ -1161,7 +1134,7 @@ export default function App() {
 
                     <button 
                       className="glass-button" 
-                      style={{ border: 'none', color: 'var(--accent-rose)', background: 'rgba(244, 63, 94, 0.05)', fontSize: '0.85rem' }}
+                      style={{ border: 'none', color: 'var(--accent-rose)', background: 'var(--accent-rose-glow)', fontSize: '0.85rem' }}
                       onClick={gd.disconnectGoogleDrive}
                     >
                       <LogOut size={16} style={{ marginRight: '8px' }} /> Disconnect Drive Account
@@ -1173,7 +1146,7 @@ export default function App() {
 
             {/* Local Storage Export/Import */}
             <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff' }}>Local Device Backups</h3>
+              <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)' }}>Local Device Backups</h3>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 Export or import ledger data directly as a local JSON file on your device. Useful for offline physical storage backups.
               </p>
@@ -1206,14 +1179,14 @@ export default function App() {
               style={{ 
                 padding: '16px', 
                 border: '1px dashed var(--accent-purple)', 
-                background: 'rgba(167, 139, 250, 0.02)',
+                background: 'var(--accent-purple-glow)',
                 display: 'flex',
                 gap: '12px'
               }}
             >
               <Info size={20} style={{ color: 'var(--accent-purple)', flexShrink: 0 }} />
               <div>
-                <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff', marginBottom: '2px' }}>How to link Google Drive</h4>
+                <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px' }}>How to link Google Drive</h4>
                 <ol style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', paddingLeft: '14px', lineHeight: '1.4' }}>
                   <li>Go to Google Cloud Developer Console.</li>
                   <li>Create a project, configure OAuth Consent screen (User Type: External).</li>
@@ -1256,14 +1229,14 @@ export default function App() {
               display: 'flex',
               flexDirection: 'column',
               gap: '16px',
-              background: 'rgba(15, 12, 30, 0.9)',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
+              background: 'var(--glass-bg)',
+              border: '1px solid var(--glass-border)'
             }}
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleAddContactSubmit}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#fff' }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {contactModalMode === 'add' ? 'Add New Contact' : 'Edit Contact Details'}
               </h2>
               <button 
@@ -1313,7 +1286,7 @@ export default function App() {
               type="submit" 
               className="glass-button"
               style={{ 
-                background: 'linear-gradient(135deg, var(--accent-purple) 0%, #7c3aed 100%)', 
+                background: 'var(--accent-purple)', 
                 border: 'none', 
                 padding: '14px', 
                 fontWeight: 600,
@@ -1355,14 +1328,14 @@ export default function App() {
               display: 'flex',
               flexDirection: 'column',
               gap: '16px',
-              background: 'rgba(15, 12, 30, 0.9)',
-              border: '1px solid rgba(255, 255, 255, 0.12)'
+              background: 'var(--glass-bg)',
+              border: '1px solid var(--glass-border)'
             }}
             onClick={(e) => e.stopPropagation()}
             onSubmit={handleTxSubmit}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: '#fff' }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {txModalMode === 'add' ? 'New Ledger Entry' : 'Edit Ledger Entry'}
               </h2>
               <button 
@@ -1382,7 +1355,7 @@ export default function App() {
                 className="glass-button"
                 style={{
                   flex: 1,
-                  background: txFormType === 'gave' ? 'rgba(244, 63, 94, 0.15)' : 'rgba(255,255,255,0.03)',
+                  background: txFormType === 'gave' ? 'var(--accent-rose-glow)' : 'var(--glass-bg)',
                   borderColor: txFormType === 'gave' ? 'var(--accent-rose)' : 'var(--glass-border)',
                   color: txFormType === 'gave' ? 'var(--accent-rose)' : 'var(--text-secondary)',
                   fontWeight: 600
@@ -1396,7 +1369,7 @@ export default function App() {
                 className="glass-button"
                 style={{
                   flex: 1,
-                  background: txFormType === 'took' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(255,255,255,0.03)',
+                  background: txFormType === 'took' ? 'var(--accent-emerald-glow)' : 'var(--glass-bg)',
                   borderColor: txFormType === 'took' ? 'var(--accent-emerald)' : 'var(--glass-border)',
                   color: txFormType === 'took' ? 'var(--accent-emerald)' : 'var(--text-secondary)',
                   fontWeight: 600
