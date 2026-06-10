@@ -410,7 +410,7 @@ export default function App() {
           >
             {/* Drawer Header */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '36px', width: 'auto', alignSelf: 'flex-start' }} />
+              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '54px', width: 'auto', alignSelf: 'flex-start' }} />
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Personal Ledger App</p>
             </div>
 
@@ -510,7 +510,7 @@ export default function App() {
               <Menu size={20} />
             </button>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '28px', width: 'auto' }} />
+              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '46px', width: 'auto' }} />
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
