@@ -95,33 +95,37 @@
   display: none;
 }
 
-body {
+html, body, #root {
+  width: 100%;
+  height: 100%;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at top left, #1c1535 0%, #0b0914 100%);
+}
+
+#root {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background: radial-gradient(circle at top left, #1c1535 0%, #0b0914 100%);
-  overflow: hidden;
 }
 
-/* App container adaptive style */
+/* App container adaptive style (mobile-first: full screen) */
 .app-container {
   width: 100%;
   height: 100%;
-  max-width: 480px;
   background: var(--container-bg);
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 50px -12px var(--shadow-color);
   color: var(--text-primary);
   transition: var(--transition-smooth);
 }
 
 @media (min-width: 481px) {
   .app-container {
+    max-width: 480px;
     height: 92vh;
     border-radius: 40px;
     border: 6px solid #1f1b2e;
