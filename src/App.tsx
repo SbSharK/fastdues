@@ -18,7 +18,9 @@ import {
   Phone, 
   Info,
   Download,
-  Upload
+  Upload,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useDues } from './hooks/useDues';
 import { useGoogleDrive } from './hooks/useGoogleDrive';
@@ -37,6 +39,37 @@ export default function App() {
 
   const [activeScreen, setActiveScreen] = useState<'home' | 'contact-detail' | 'settings'>('home');
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  // Initialize theme based on user preference or system theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme_preference') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else {
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(systemPrefersDark ? 'dark' : 'light');
+    }
+  }, []);
+
+  // Listen for system theme changes dynamically
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      const savedTheme = localStorage.getItem('theme_preference');
+      if (!savedTheme) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme_preference', newTheme);
+  };
   
   // Navigation / UI States
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -305,7 +338,7 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${theme}`}>
       {/* Toast Notification */}
       {toastMessage && (
         <div 
@@ -377,7 +410,7 @@ export default function App() {
           >
             {/* Drawer Header */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <img src="/fastDues.svg" alt="FastDues" style={{ height: '36px', width: 'auto', alignSelf: 'flex-start' }} />
+              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '36px', width: 'auto', alignSelf: 'flex-start' }} />
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Personal Ledger App</p>
             </div>
 
@@ -477,20 +510,33 @@ export default function App() {
               <Menu size={20} />
             </button>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/fastDues.svg" alt="FastDues" style={{ height: '28px', width: 'auto' }} />
+              <img src="/fastDues.svg" alt="FastDues" className="app-logo-img" style={{ height: '28px', width: 'auto' }} />
             </div>
 
-            <button 
-              className={`btn-status ${getCloudStatusColor()}`}
-              onClick={handleCloudSyncBtnClick}
-              title={`Cloud status: ${dues.cloudStatus}. Click to Sync.`}
-            >
-              {gd.isSyncing ? (
-                <RefreshCw size={20} className="animate-spin" style={{ animation: 'spin 1.5s linear infinite' }} />
-              ) : (
-                <Cloud size={20} />
-              )}
-            </button>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              {/* Theme Toggle Button */}
+              <button 
+                className="glass-button" 
+                style={{ padding: '8px', borderRadius: '50%', width: '40px', height: '40px', border: 'none' }}
+                onClick={toggleTheme}
+                title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+              >
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+
+              {/* Cloud sync button */}
+              <button 
+                className={`btn-status ${getCloudStatusColor()}`}
+                onClick={handleCloudSyncBtnClick}
+                title={`Cloud status: ${dues.cloudStatus}. Click to Sync.`}
+              >
+                {gd.isSyncing ? (
+                  <RefreshCw size={20} className="animate-spin" style={{ animation: 'spin 1.5s linear infinite' }} />
+                ) : (
+                  <Cloud size={20} />
+                )}
+              </button>
+            </div>
           </header>
 
           {/* Screen Content Wrapper */}
